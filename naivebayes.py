@@ -18,7 +18,7 @@ class NaiveBayesClassifier:
     '''
     initializes the naive bayes classifier
     '''
-    
+
     # load the english stopwords
     self.stopwords = stopwords.words('english')
 
@@ -69,7 +69,7 @@ class NaiveBayesClassifier:
 
     allows to set the vocabulary_threshold to test whether more occurances
     of a word increases or decreases accuracy
-    ''''
+    '''
     self._prior_probabilities()
 
     real = self.build_vocabulary(self.dataset[self.dataset.label == 0])
