@@ -131,23 +131,23 @@ class NaiveBayesClassifier:
     it returns the percentage of accuracy in decimal
     '''
     z = {}
-    z['real'] = 0
-    z['fake'] = 0
+    z['correct'] = 0
+    z['incorrect'] = 0
     for y in self.testset.itertuples():
       i = self.classify(str(y.text), alpha=alpha)
   
       if i is y.label:
-        z['real'] += 1
+        z['correct'] += 1
       else: 
-        z['fake'] += 1    
+        z['incorrect'] += 1    
     lcount = len(self.testset)
     print("Classified:", lcount)
     print("# Actual real", len(self.testset[self.testset.label == 0]))
     print("# Actual fake", len(self.testset[self.testset.label == 1]))
-    print("# Classified real:", z['real'])
-    print("# Classified fake:", z['fake'])
+    print("# Classified correctly:", z['correct'])
+    print("# Classified incorrectly:", z['incorrect'])
 
-    return z['real'] / (z['real'] + z['fake'])
+    return z['correct'] / (z['correct'] + z['incorrect'])
 
   def __tokenize_string(self, text):
     '''
