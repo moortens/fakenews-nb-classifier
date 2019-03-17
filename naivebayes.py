@@ -89,7 +89,7 @@ class NaiveBayesClassifier:
     '''
     saves the currently trained model to disk, for faster 
     classification in succeeding executions of the program.
-    ''''
+    '''
     v = {
       "reliable": self.reliable,
       "unreliable": self.unreliable,
