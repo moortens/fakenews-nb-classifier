@@ -15,6 +15,10 @@ nltk.download(['stopwords', 'punkt'], quiet=True)
 
 class NaiveBayesClassifier:
   def __init__(self, file: str = None, vocabulary: str = 'data/vocabulary.csv', train: str = 'data/train.csv'):
+    '''
+    initializes the naive bayes classifier
+    '''
+    
     # load the english stopwords
     self.stopwords = stopwords.words('english')
 
@@ -31,6 +35,9 @@ class NaiveBayesClassifier:
       self.load_data(file)
 
   def load_data(self, file):
+    '''
+    loads a pretrained model from disk
+    '''
     if file is not None:
       try:
         with open(file, 'r') as db:
@@ -46,7 +53,9 @@ class NaiveBayesClassifier:
 
 
   def _prior_probabilities(self):
-    # label count
+    '''
+    calculates the prior probabilities to use in classify() 
+    '''
     self.label_count = self.dataset.groupby('label').size()
     self.total_count = self.dataset['label'].size
 
@@ -54,6 +63,13 @@ class NaiveBayesClassifier:
     self.prior_unreliable_probability = self.label_count[1]/self.total_count
 
   def train(self, vocabulary_threshold: int = 0):
+    '''
+    trains the naive bayes classifier, building two vocabularies from
+    the dataset.
+
+    allows to set the vocabulary_threshold to test whether more occurances
+    of a word increases or decreases accuracy
+    ''''
     self._prior_probabilities()
 
     real = self.build_vocabulary(self.dataset[self.dataset.label == 0])
@@ -70,6 +86,10 @@ class NaiveBayesClassifier:
           self.unreliable[w.words] = fake[w.words]
 
   def save(self, file: str = 'model.json'):
+    '''
+    saves the currently trained model to disk, for faster 
+    classification in succeeding executions of the program.
+    ''''
     v = {
       "reliable": self.reliable,
       "unreliable": self.unreliable,
@@ -81,7 +101,10 @@ class NaiveBayesClassifier:
       json.dump(v, db)
 
   def classify(self, text, alpha: float = 1.0):
-    # classifies the text and returns 0 if fake and 1 if real
+    '''
+    classifies the text and returns 0 if fake and 1 if real using 
+    naive bayes with logarithms. 
+    '''
 
     vocab_size = len(self.reliable) + len(self.unreliable)
 
@@ -118,18 +141,21 @@ class NaiveBayesClassifier:
       else: 
         z['fake'] += 1    
     lcount = len(self.testset)
-    print("classified:", lcount)
-    print("# real", len(self.testset[self.testset.label == 0]))
-    print("# fake", len(self.testset[self.testset.label == 1]))
-    print("# real classified:", z['real'])
-    print("# fake classified:", z['fake'])
+    print("Classified:", lcount)
+    print("# Actual real", len(self.testset[self.testset.label == 0]))
+    print("# Actual fake", len(self.testset[self.testset.label == 1]))
+    print("# Classified real:", z['real'])
+    print("# Classified fake:", z['fake'])
 
     return z['real'] / (z['real'] + z['fake'])
 
   def __tokenize_string(self, text):
-      text = str(text)
-      text = re.sub(self.punctuation_pattern, '', text)
-      return [self.porter.stem(w) for w in text.split() if w.isalpha() and w not in self.stopwords]
+    '''
+    tokenizes a string, removing punctuation and stopwords
+    '''
+    text = str(text)
+    text = re.sub(self.punctuation_pattern, '', text)
+    return [self.porter.stem(w) for w in text.split() if w.isalpha() and w not in self.stopwords]
 
   def build_vocabulary(self, series):
     '''
@@ -153,11 +179,3 @@ class NaiveBayesClassifier:
 
     # return a new vocabulary
     return vocab
-
-
-#x = NaiveBayesClassifier(file='model.json')
-#x.train()
-#x.save()
-#print("scored", x.test(alpha=0.001))
-
-
