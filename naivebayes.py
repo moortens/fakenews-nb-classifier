@@ -21,7 +21,7 @@ class NaiveBayesClassifier:
     # initialize the porter stemmer from the nltk package, used to find the root of a word
     self.porter = PorterStemmer()
 
-    # a simple regular expression to remove punctuation (!,.?, etc). 
+    # a simple regular expression to remove punctuation (!,.?, etc).
     self.punctuation_pattern = re.compile('[{}]'.format(string.punctuation))
 
     self.vocabulary = pd.read_csv(vocabulary,  header=None, names=['words', 'frequency'])
@@ -81,8 +81,10 @@ class NaiveBayesClassifier:
       json.dump(v, db)
 
   def classify(self, text, alpha: float = 1.0):
+    # classifies the text and returns 0 if fake and 1 if real
+
     vocab_size = len(self.reliable) + len(self.unreliable)
-    
+
     real = math.log(self.prior_reliable_probability)
     fake = math.log(self.prior_unreliable_probability)
     
@@ -99,6 +101,12 @@ class NaiveBayesClassifier:
     return 0
 
   def test(self, alpha: float = 1.0):
+    '''
+    test goes through the classification of the training and compares it to the actual answer
+    it prints the number of counted real and fake articles and the real and fake classified articles
+
+    it returns the percentage of accuracy in decimal
+    '''
     z = {}
     z['real'] = 0
     z['fake'] = 0
